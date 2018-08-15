@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org">
+<body>
+	<h2>RevHost File Hosting
+	<br>Upload File</h2>
+	<hr>
+	Username:
+	<div sec:authentication="name"></div>
+	<hr>
+
+	<div>
+		<form method="POST" enctype="multipart/form-data" th:action="@{/storage/upload}">
+			<table>
+				<tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
+				<tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+			</table>
+		</form>
+	</div>
+	
+	<hr>
+	<a th:href="@{/}">Back to home page</a>
+	
+</body>
+</html>

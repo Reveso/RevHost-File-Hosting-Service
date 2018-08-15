@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org">
+
+<head>
+<title>Files</title>
+</head>
+
+<body>
+	
+	<h2>RevHost File Hosting
+	<br>Files</h2>
+	<hr>
+	Username:
+	<div sec:authentication="name"></div>
+	<hr>
+
+
+		<th:block th:each="file : ${files}">
+			<a th:href="@{/storage/file(code=${file.code})}" th:text="${file.name}" 
+				style="font-size: 20px;"></a> 
+				Size=<a th:text="${file.getSizeAsString()}" style="font-size: 15px;"></a>
+				 | Addition Date=<a th:text="${#strings.substring(file.additionDate, 0, #strings.length(file.additionDate)-2)}" style="font-size: 15px;"></a>
+			<br>
+			<a th:href="@{/storage(v=${file.code})}">Download</a> | 
+			<a th:href="@{/storage/delete(code=${file.code})}"
+				onclick="if(!(confirm('Are you sure you want to delete this file?'))) return false">
+				Delete</a>
+			<hr>
+		</th:block>
+		
+		<a th:href="@{/}">Back to home page</a>
+	
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymleaf.org"
+	xmlns:sec="http://www.thymeleaf.org">
+
+<head>
+<title>RevHost</title>
+</head>
+
+<body>
+
+	<h2>RevHost File Hosting</h2>
+
+	<hr>
+	<div sec:authorize="isAuthenticated()">
+		<div sec:authentication="name"></div>
+		Authenticated user roles:
+		<div sec:authentication="principal.authorities"></div>
+		<hr>
+		<form th:action="@{/storage/files}" method="GET">
+			<input type="submit" value="Files" />
+		</form>
+
+		<br>
+		<form th:action="@{/storage/upload}" method="GET">
+			<input type="submit" value="Upload" />
+		</form>
+
+		<hr>
+		<form th:action="@{/logout}" method="POST">
+			<input type="submit" value="Logout" />
+		</form>
+	</div>
+
+	<div sec:authorize="isAnonymous()">
+		<form th:action="@{/users/login}" method="GET">
+			<input type="submit" value="Login" />
+		</form>
+		<br>
+		<form th:action="@{/users/showRegistrationForm}" method="GET">
+			<input type="submit" value="Sign up" />
+		</form>
+	</div>
+
+</body>
+
+</html>

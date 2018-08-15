@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Register</title> 
+
+<style>
+	.error { color: red; }
+</style>
+</head>
+
+<body>
+
+	<h1>Sign up to RevHost</h1>
+	<p th:text="${registrationError}" class="error" />
+
+	<form th:action="@{/users/processRegistrationForm}" method="POST"
+		th:object="${newUser}">
+		<p>
+			Username: <input type="text" th:field="*{username}"
+				autofocus="autofocus" />
+		</p>
+
+		<p>
+			Password: <input type="password" th:field="*{password}" />
+		</p>
+
+		<input type="submit" value="Sign up" />
+	</form>
+
+	<br>
+	<form th:action="@{/}" method="get">
+		<input type="submit" value="Back to Home Page" />
+	</form>
+
+
+</body>
+
+</html>

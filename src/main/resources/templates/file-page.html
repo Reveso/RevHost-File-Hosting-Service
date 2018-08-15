@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Files</title>
+</head>
+
+<body>
+	<h2>
+		RevHost File Hosting 
+	</h2>
+	
+	<hr>
+	Username:
+	<div sec:authentication="name"></div>
+	<hr>
+	
+	<a th:text="${file.name}" style="font-size: 20px;"></a>
+
+</body>
+</html>
