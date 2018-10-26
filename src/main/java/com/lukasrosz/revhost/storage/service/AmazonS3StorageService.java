@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.auth.AWSCredentials;
@@ -62,10 +62,9 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	@Override
-	@Transactional
 	public boolean store(MultipartFile multipartFile) {
 		String loggedUser = getLoggedUser();
-		String fileCode = FileDTO.generateNewCode(fileDAO.getAllFileCodes());
+		String fileCode = FileDTO.generateNewCode(fileDAO.findAllCodes());
 		String filePath = "";
 
 		try {
@@ -93,7 +92,7 @@ public class AmazonS3StorageService implements StorageService {
 		fileDTO.setUrl(s3client.getUrl(bucketName, filePath).toString());
 
 		System.out.println(fileDTO);
-		fileDAO.saveFile(fileDTO);
+		fileDAO.save(fileDTO);
 		return true;
 	}
 
@@ -121,26 +120,25 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	@Override
-	@Transactional
 	public List<FileDTO> loadLoggedUserFiles() {
-	    return fileDAO.getUserFiles(getLoggedUser());
+		return fileDAO.findByUsername(getLoggedUser());
 	}
 
 	@Override
-	@Transactional
-	public FileDTO loadFile(String code) throws AccessToFileDeniedException {
-		FileDTO file = fileDAO.getFile(code);
-		
-		if(getLoggedUser().equals(file.getUsername())
-				|| file.isPublicAccess()) {
-			return file;
+	public FileDTO loadFile(String fileCode) throws AccessToFileDeniedException {
+		FileDTO fileDTO = getFileFromDB(fileCode);
+		if(fileDTO == null) return null;
+
+		if(getLoggedUser().equals(fileDTO.getUsername())
+				|| fileDTO.isPublicAccess()) {
+			return fileDTO;
 		} else throw new AccessToFileDeniedException();
 	}
 
 	@Override
-	@Transactional
-	public InputStream loadAsInputStream(String code) throws AccessToFileDeniedException {
-		FileDTO fileDTO = fileDAO.getFile(code);
+	public InputStream loadAsInputStream(String fileCode) throws AccessToFileDeniedException {
+		FileDTO fileDTO = getFileFromDB(fileCode);
+		if(fileDTO == null) return null;
 
 		if (!getLoggedUser().equals(fileDTO.getUsername())
 				&& !fileDTO.isPublicAccess()) {
@@ -152,24 +150,23 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	@Override
-	@Transactional
 	public void deleteFile(String fileCode) throws AccessToFileDeniedException {
-		FileDTO file = fileDAO.getFile(fileCode);
+		FileDTO fileDTO = getFileFromDB(fileCode);
+		if(fileDTO == null) return;
 
-		if (getLoggedUser().equals(file.getUsername())) {
-			deleteFileFromS3Bucket(file);
-			fileDAO.deleteFile(fileCode);
+		if (getLoggedUser().equals(fileDTO.getUsername())) {
+			deleteFileFromS3Bucket(fileDTO);
+			fileDAO.deleteById(fileCode);
 		} else throw new AccessToFileDeniedException("Logged user is not file's owner");
 	}
 
 	@Override
-	@Transactional
 	public void deleteAll(String username) throws AccessToFileDeniedException {
 		if (!getLoggedUser().equals(username)) {
 			throw new AccessToFileDeniedException("Logged user is not file's owner");
 		}
 
-		List<String> codes = fileDAO.getUserFileCodes(username);
+		List<String> codes = fileDAO.findCodesByUsername(username);
 		for(String code : codes) {
 			deleteFile(code);
 		}
@@ -182,7 +179,9 @@ public class AmazonS3StorageService implements StorageService {
 
     @Override
     public void setFileAccess(String fileCode, String access) throws AccessToFileDeniedException {
-		FileDTO fileDTO = fileDAO.getFile(fileCode);
+		FileDTO fileDTO = getFileFromDB(fileCode);
+		if(fileDTO == null) return;
+
 		if(!getLoggedUser().equals(fileDTO.getUsername())) {
 			throw new AccessToFileDeniedException("Logged user is not file's owner");
 		}
@@ -197,12 +196,17 @@ public class AmazonS3StorageService implements StorageService {
 	private void setFilePrivate(FileDTO fileDTO) {
 		s3client.setObjectAcl(fileDTO.getBucketName(), fileDTO.getKey(), CannedAccessControlList.Private);
 		fileDTO.setPublicAccess(false);
-		fileDAO.saveFile(fileDTO);
+		fileDAO.save(fileDTO);
 	}
 
 	private void setFilePublic(FileDTO fileDTO) {
 		s3client.setObjectAcl(fileDTO.getBucketName(), fileDTO.getKey(), CannedAccessControlList.PublicRead);
 		fileDTO.setPublicAccess(true);
-		fileDAO.saveFile(fileDTO);
+		fileDAO.save(fileDTO);
+	}
+
+	private FileDTO getFileFromDB(String fileCode) {
+		Optional<FileDTO> optionalFileDTO = fileDAO.findById(fileCode);
+		return optionalFileDTO.isPresent() ? optionalFileDTO.get() : null;
 	}
 }

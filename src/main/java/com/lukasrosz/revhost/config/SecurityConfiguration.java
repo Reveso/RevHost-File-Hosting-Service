@@ -15,14 +15,17 @@ import org.springframework.security.provisioning.UserDetailsManager;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-	
+
+	private DataSource mainDataSource;
+
 	@Autowired
-	private DataSource revhostDataSource;
-	
+	public SecurityConfiguration(DataSource mainDataSource) {
+		this.mainDataSource = mainDataSource;
+	}
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
-		auth.jdbcAuthentication().dataSource(revhostDataSource);
+		auth.jdbcAuthentication().dataSource(mainDataSource);
 	}
 
 	@Override
@@ -50,7 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	public UserDetailsManager userDetailsManager() {
 		
 		JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager();
-		jdbcUserDetailsManager.setDataSource(revhostDataSource);
+		jdbcUserDetailsManager.setDataSource(mainDataSource);
 		
 		return jdbcUserDetailsManager;
 	}

@@ -1,24 +1,18 @@
 package com.lukasrosz.revhost.storage.dao;
 
 import com.lukasrosz.revhost.storage.entity.FileDTO;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface FileDAO {
+public interface FileDAO extends CrudRepository<FileDTO, String> {
 
-	List<FileDTO> getUserFiles(String username);
-	
-	List<String> getUserFileCodes(String username);
-	
-	void saveFile(FileDTO file);
-	
-	FileDTO getFile(String fileCode);
-	
-	void deleteFile(String fileCode);
+	List<FileDTO> findByUsername(String username);
 
-	void deleteAllUserFiles(String username);
+	@Query("select f.code from FileDTO f where f.username=username")
+	List<String> findCodesByUsername(String username);
 
-	List<String> getAllFileCodes();
-
-	List<FileDTO> getUserPublicFiles(String username);
+	@Query("select f.code from FileDTO f")
+	List<String> findAllCodes();
 }

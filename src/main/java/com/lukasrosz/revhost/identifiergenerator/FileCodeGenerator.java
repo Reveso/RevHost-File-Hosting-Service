@@ -1,4 +1,4 @@
-package com.lukasrosz.revhost.identifiergenerators;
+package com.lukasrosz.revhost.identifiergenerator;
 
 import java.io.Serializable;
 
