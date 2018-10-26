@@ -8,7 +8,7 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.lukasrosz.revhost.storage.entities.User;
+import com.lukasrosz.revhost.storage.entity.UserDTO;
 
 @Repository
 public class UserDAOImpl implements UserDAO {
@@ -17,42 +17,42 @@ public class UserDAOImpl implements UserDAO {
 	private SessionFactory revhostSessionFactory;
 
 	@Override
-	public List<User> getUsersList() {
+	public List<UserDTO> getUsersList() {
 		
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		Query<User> usersQuery = session.createQuery("SELECT u FROM User u", 
-																User.class);
+		Query<UserDTO> usersQuery = session.createQuery("SELECT u FROM UserDTO u",
+																UserDTO.class);
 		
-		List<User> usersList = usersQuery.getResultList();
+		List<UserDTO> usersList = usersQuery.getResultList();
 		
-		usersList.forEach(user -> System.out.println(user.getAuthorities()));
+		usersList.forEach(userDTO -> System.out.println(userDTO.getAuthorities()));
 		return usersList;
 	}
 
 	@Override
-	public User getUser(String username) {
+	public UserDTO getUser(String username) {
 
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		User user = session.get(User.class, username);
+		UserDTO userDTO = session.get(UserDTO.class, username);
 		
-		return user;
+		return userDTO;
 	}
 
 	@Override
-	public void saveUser(User user) {
+	public void saveUser(UserDTO userDTO) {
 
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		session.saveOrUpdate(user);
+		session.saveOrUpdate(userDTO);
 	}
 	
 	@Override
 	public void deleteUser(String username) {
 		Session session = revhostSessionFactory.getCurrentSession();
 
-		Query<?> query = session.createQuery("delete from User where username=:uname");
+		Query<?> query = session.createQuery("delete from UserDTO where username=:uname");
 		query.setParameter("uname", username);
 		
 		query.executeUpdate();

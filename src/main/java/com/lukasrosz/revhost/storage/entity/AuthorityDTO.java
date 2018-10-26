@@ -1,4 +1,4 @@
-package com.lukasrosz.revhost.storage.entities;
+package com.lukasrosz.revhost.storage.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="authorities")
-public class Authority {
+public class AuthorityDTO {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -25,17 +25,16 @@ public class Authority {
 	@Column(name="authority")
 	private String authority;
 	
-	
-	public Authority() {
+	public AuthorityDTO() {
 		
 	}
 
-	public Authority(@NotNull String username, @NotNull String authority) {
+	public AuthorityDTO(@NotNull String username, @NotNull String authority) {
 		this.username = username;
 		this.authority = authority;
 	}
 	
-	public Authority(@NotNull String authority) {
+	public AuthorityDTO(@NotNull String authority) {
 		this.authority = authority;
 	}
 	

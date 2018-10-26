@@ -2,6 +2,7 @@ package com.lukasrosz.revhost.storage.dao;
 
 import java.util.List;
 
+import com.lukasrosz.revhost.storage.entity.FileDTO;
 import org.hibernate.query.Query;
 
 import org.hibernate.Session;
@@ -9,35 +10,31 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.lukasrosz.revhost.storage.entities.RevHostFile;
-
 @Repository
 public class FileDAOImpl implements FileDAO {
 
 	@Autowired
 	private SessionFactory revhostSessionFactory;
 	
-	
-	
 	@Override
 	public List<String> getAllFileCodes() {
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		Query<String> codessQuery = session.createQuery("SELECT code FROM RevHostFile", String.class);
+		Query<String> codesQuery = session.createQuery("SELECT code FROM FileDTO", String.class);
 		
-		List<String> codes = codessQuery.getResultList();
+		List<String> codes = codesQuery.getResultList();
 		return codes;
 	}
 
 	@Override
-	public List<RevHostFile> getUserFiles(String username) {
+	public List<FileDTO> getUserFiles(String username) {
 
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		Query<RevHostFile> filesQuery = session.createQuery("FROM RevHostFile WHERE username=:uname", RevHostFile.class);
+		Query<FileDTO> filesQuery = session.createQuery("FROM FileDTO WHERE username=:uname", FileDTO.class);
 		filesQuery.setParameter("uname", username);
 		
-		List<RevHostFile> files = filesQuery.getResultList();
+		List<FileDTO> files = filesQuery.getResultList();
 		
 		return files;
 	}
@@ -46,16 +43,16 @@ public class FileDAOImpl implements FileDAO {
 	public List<String> getUserFileCodes(String username) {
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		Query<String> codessQuery = session.createQuery("SELECT code FROM RevHostFile WHERE username=:uname", String.class);
-		codessQuery.setParameter("uname", username);
+		Query<String> codesQuery = session.createQuery("SELECT code FROM FileDTO WHERE username=:uname", String.class);
+		codesQuery.setParameter("uname", username);
 		
-		List<String> codes = codessQuery.getResultList();
+		List<String> codes = codesQuery.getResultList();
 		
 		return codes;
 	}
 
 	@Override
-	public void saveFile(RevHostFile file) {
+	public void saveFile(FileDTO file) {
 		Session session = revhostSessionFactory.getCurrentSession();
 		System.out.println(file);
 
@@ -64,10 +61,10 @@ public class FileDAOImpl implements FileDAO {
 	}
 
 	@Override
-	public RevHostFile getFile(String fileCode) {
+	public FileDTO getFile(String fileCode) {
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		RevHostFile file = session.get(RevHostFile.class, fileCode);
+		FileDTO file = session.get(FileDTO.class, fileCode);
 		return file;
 	}
 
@@ -75,14 +72,14 @@ public class FileDAOImpl implements FileDAO {
 	public void deleteFile(String fileCode) {
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		Query<?> query = session.createQuery("DELETE FROM RevHostFile WHERE code=:fileCode");
+		Query<?> query = session.createQuery("DELETE FROM FileDTO WHERE code=:fileCode");
 		query.setParameter("fileCode", fileCode);
 		
 		query.executeUpdate();
 	}
 	
 	@Override
-	public void deleteAllFilesOfUser(String username) {
+	public void deleteAllUserFiles(String username) {
 		Session session = revhostSessionFactory.getCurrentSession();
 		
 		Query<?> query = session.createQuery("DELETE FROM RevHostFile WHERE username=:uname");
@@ -92,14 +89,12 @@ public class FileDAOImpl implements FileDAO {
 	}
 	
 	@Override
-	public List<RevHostFile> getUserPublicFiles(String username) {
+	public List<FileDTO> getUserPublicFiles(String username) {
 		Session session = revhostSessionFactory.getCurrentSession();
 		
-		Query<RevHostFile> query = session.createQuery("FROM RevHostFile WHERE access=public", RevHostFile.class);
-		List<RevHostFile> files = query.getResultList();
+		Query<FileDTO> query = session.createQuery("FROM FileDTO WHERE access=public", FileDTO.class);
+		List<FileDTO> files = query.getResultList();
 		
 		return files;
 	}
-	
-
 }

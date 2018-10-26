@@ -1,4 +1,4 @@
-package com.lukasrosz.revhost;
+package com.lukasrosz.revhost.config;
 
 import javax.sql.DataSource;
 

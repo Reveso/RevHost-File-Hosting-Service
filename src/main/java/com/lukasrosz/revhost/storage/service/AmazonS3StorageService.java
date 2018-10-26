@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import com.lukasrosz.revhost.storage.entity.FileDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -26,20 +25,16 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.lukasrosz.revhost.exception.AccessToFileDeniedException;
 import com.lukasrosz.revhost.storage.dao.FileDAO;
-import com.lukasrosz.revhost.storage.dao.UserDAO;
-import com.lukasrosz.revhost.storage.entities.RevHostFile;
 
 @Service
 public class AmazonS3StorageService implements StorageService {
 
 	private AmazonS3 s3client;
-	
-	private UserDAO userDAO;
-	
+		
 	private FileDAO fileDAO;
 
 	@Value("${amazonProperties.endpointUrl}")
@@ -55,9 +50,8 @@ public class AmazonS3StorageService implements StorageService {
 	private String secretKey;
 
 	@Autowired
-	public AmazonS3StorageService(UserDAO userDAO, FileDAO fileDAO) {
+	public AmazonS3StorageService(FileDAO fileDAO) {
 		this.fileDAO = fileDAO;
-		this.userDAO = userDAO;
 	}
 	
 	@PostConstruct
@@ -68,10 +62,10 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	@Override
-	@Transactional(value = "revhostTransactionManager")
+	@Transactional
 	public boolean store(MultipartFile multipartFile) {
 		String loggedUser = getLoggedUser();
-		String fileCode = RevHostFile.generateNewCode(fileDAO.getAllFileCodes());
+		String fileCode = FileDTO.generateNewCode(fileDAO.getAllFileCodes());
 		String filePath = "";
 
 		try {
@@ -84,26 +78,22 @@ public class AmazonS3StorageService implements StorageService {
 			e.printStackTrace();
 			return false;
 		}
-		RevHostFile dbFile = new RevHostFile();
-		dbFile.setCode(fileCode);
-		dbFile.setBucketName(bucketName);
-		dbFile.setKey(filePath);
-		dbFile.setName(multipartFile.getOriginalFilename().replace(" ", "_"));
 
-		if (dbFile.getName().endsWith(".mp4")) {
-			dbFile.setType("video");
-		} else {
-			dbFile.setType("file");
-		}
-		
-		dbFile.setSize(multipartFile.getSize());
-		dbFile.setAccess("private");
-		dbFile.setUsername(getLoggedUser());
-		
-		dbFile.setAdditionDate(new Date()); //TODO set addition date
+		FileDTO fileDTO = new FileDTO();
+		fileDTO.setCode(fileCode);
+		fileDTO.setBucketName(bucketName);
+		fileDTO.setKey(filePath);
+		fileDTO.setName(multipartFile.getOriginalFilename().replace(" ", "_"));
 
-		System.out.println(dbFile);
-		fileDAO.saveFile(dbFile);
+		fileDTO.setSize(multipartFile.getSize());
+		fileDTO.setPublicAccess(false);
+		fileDTO.setUsername(getLoggedUser());
+
+		fileDTO.setAdditionDate(new Date());
+		fileDTO.setUrl(s3client.getUrl(bucketName, filePath).toString());
+
+		System.out.println(fileDTO);
+		fileDAO.saveFile(fileDTO);
 		return true;
 	}
 
@@ -131,107 +121,88 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	@Override
-	@Transactional(value = "revhostTransactionManager")
-	public List<RevHostFile> loadAll(String username) {
-		if (getLoggedUser().equals(username)) {
-			return fileDAO.getUserFiles(username);
-		} else return null;
-		
+	@Transactional
+	public List<FileDTO> loadLoggedUserFiles() {
+	    return fileDAO.getUserFiles(getLoggedUser());
 	}
 
 	@Override
-	@Transactional(value = "revhostTransactionManager")
-	public RevHostFile loadFile(String code) {
-		RevHostFile file = fileDAO.getFile(code);
+	@Transactional
+	public FileDTO loadFile(String code) throws AccessToFileDeniedException {
+		FileDTO file = fileDAO.getFile(code);
 		
 		if(getLoggedUser().equals(file.getUsername())
-				|| file.getAccess().equals("public")) {
+				|| file.isPublicAccess()) {
 			return file;
-		} else return null;
+		} else throw new AccessToFileDeniedException();
 	}
 
 	@Override
-	@Transactional(value = "revhostTransactionManager")
-	public InputStream loadAsInputStream(String code) {
-		RevHostFile revHostFile = fileDAO.getFile(code);
+	@Transactional
+	public InputStream loadAsInputStream(String code) throws AccessToFileDeniedException {
+		FileDTO fileDTO = fileDAO.getFile(code);
 
-		if (!getLoggedUser().equals(revHostFile.getUsername())
-				&& revHostFile.getAccess().equals("private")) {
-			return null;
+		if (!getLoggedUser().equals(fileDTO.getUsername())
+				&& !fileDTO.isPublicAccess()) {
+			throw new AccessToFileDeniedException();
 		}
 
-		S3Object s3Object = s3client.getObject(bucketName, revHostFile.getKey());
+		S3Object s3Object = s3client.getObject(bucketName, fileDTO.getKey());
 		return s3Object.getObjectContent();
 	}
 
 	@Override
-	@Transactional(value = "revhostTransactionManager")
-	public String getVideoUrl(String fileCode) {
-		RevHostFile revHostFile = fileDAO.getFile(fileCode);
-		if (!getLoggedUser().equals(revHostFile.getUsername())
-				&& revHostFile.getAccess().equals("private")) {
-			return null;
-		}// TODO Throw exception instead
-		
-		// example of a key: storage/username/code/filename
-
-				// making a link below
-				// Date expiration = new Date();
-				// long expTimeMilis = expiration.getTime();
-				// expTimeMilis += 1000*60;
-				// expiration.setTime(expTimeMilis);
-				//
-				// GeneratePresignedUrlRequest generatePresignedUrlRequest =
-				// new GeneratePresignedUrlRequest(bucketName, key)
-				// .withMethod(HttpMethod.GET)
-				// .withExpiration(expiration);
-				// URL url = s3client.generatePresignedUrl(generatePresignedUrlRequest);
-				// System.out.println(url);
-		
-		Date expiration = new Date();
-		long expTimeMilis = expiration.getTime();
-		expTimeMilis += 1000 * 60;
-		expiration.setTime(expTimeMilis);
-
-		GeneratePresignedUrlRequest generatePresignedUrlRequest = 
-				new GeneratePresignedUrlRequest(revHostFile.getBucketName(), revHostFile.getKey())
-				.withMethod(HttpMethod.GET)
-				.withExpiration(expiration);
-		URL url = s3client.generatePresignedUrl(generatePresignedUrlRequest);
-		System.out.println(url);
-		return url.toString();
-	}
-
-	@Override
-	@Transactional(value = "revhostTransactionManager")
-	public boolean deleteFile(String fileCode) {
-		RevHostFile file = fileDAO.getFile(fileCode);
+	@Transactional
+	public void deleteFile(String fileCode) throws AccessToFileDeniedException {
+		FileDTO file = fileDAO.getFile(fileCode);
 
 		if (getLoggedUser().equals(file.getUsername())) {
 			deleteFileFromS3Bucket(file);
 			fileDAO.deleteFile(fileCode);
-			return true;
-		} else
-			return false;
+		} else throw new AccessToFileDeniedException("Logged user is not file's owner");
 	}
 
 	@Override
-	@Transactional(value = "revhostTransactionManager")
-	public boolean deleteAll(String username) {
-		if (getLoggedUser().equals(username)) {
-			return false;
+	@Transactional
+	public void deleteAll(String username) throws AccessToFileDeniedException {
+		if (!getLoggedUser().equals(username)) {
+			throw new AccessToFileDeniedException("Logged user is not file's owner");
 		}
 
 		List<String> codes = fileDAO.getUserFileCodes(username);
-		codes.forEach(code -> deleteFile(code));
-
-		return true;
+		for(String code : codes) {
+			deleteFile(code);
+		}
 	}
 
-	private void deleteFileFromS3Bucket(RevHostFile file) {
+	private void deleteFileFromS3Bucket(FileDTO file) {
 		s3client.deleteObject(new DeleteObjectRequest(file.getBucketName(), 
 				file.getKey()));
-
 	}
 
+    @Override
+    public void setFileAccess(String fileCode, String access) throws AccessToFileDeniedException {
+		FileDTO fileDTO = fileDAO.getFile(fileCode);
+		if(!getLoggedUser().equals(fileDTO.getUsername())) {
+			throw new AccessToFileDeniedException("Logged user is not file's owner");
+		}
+
+		if(access.equals("private")) {
+			setFilePrivate(fileDTO);
+		} else if (access.equals("public")) {
+			setFilePublic(fileDTO);
+		}
+	}
+
+	private void setFilePrivate(FileDTO fileDTO) {
+		s3client.setObjectAcl(fileDTO.getBucketName(), fileDTO.getKey(), CannedAccessControlList.Private);
+		fileDTO.setPublicAccess(false);
+		fileDAO.saveFile(fileDTO);
+	}
+
+	private void setFilePublic(FileDTO fileDTO) {
+		s3client.setObjectAcl(fileDTO.getBucketName(), fileDTO.getKey(), CannedAccessControlList.PublicRead);
+		fileDTO.setPublicAccess(true);
+		fileDAO.saveFile(fileDTO);
+	}
 }

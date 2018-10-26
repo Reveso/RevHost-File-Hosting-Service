@@ -2,15 +2,15 @@ package com.lukasrosz.revhost.storage.dao;
 
 import java.util.List;
 
-import com.lukasrosz.revhost.storage.entities.User;
+import com.lukasrosz.revhost.storage.entity.UserDTO;
 
 public interface UserDAO {
 	
-	public List<User> getUsersList();
+	public List<UserDTO> getUsersList();
 
-	public User getUser(String username);
+	public UserDTO getUser(String username);
 
-	public void saveUser(User user);
+	public void saveUser(UserDTO userDTO);
 
 	void deleteUser(String username);
 

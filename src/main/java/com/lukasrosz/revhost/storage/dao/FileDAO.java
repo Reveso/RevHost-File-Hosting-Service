@@ -1,23 +1,24 @@
 package com.lukasrosz.revhost.storage.dao;
 
-import com.lukasrosz.revhost.storage.entities.RevHostFile;
+import com.lukasrosz.revhost.storage.entity.FileDTO;
+
 import java.util.List;
 
 public interface FileDAO {
 
-	List<RevHostFile> getUserFiles(String username);
+	List<FileDTO> getUserFiles(String username);
 	
 	List<String> getUserFileCodes(String username);
 	
-	void saveFile(RevHostFile file);
+	void saveFile(FileDTO file);
 	
-	RevHostFile getFile(String fileCode);
+	FileDTO getFile(String fileCode);
 	
 	void deleteFile(String fileCode);
 
-	void deleteAllFilesOfUser(String username);
+	void deleteAllUserFiles(String username);
 
 	List<String> getAllFileCodes();
 
-	List<RevHostFile> getUserPublicFiles(String username);
+	List<FileDTO> getUserPublicFiles(String username);
 }

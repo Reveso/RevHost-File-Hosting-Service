@@ -1,13 +1,12 @@
-package com.lukasrosz.revhost.controllers;
+package com.lukasrosz.revhost.controller;
 
+import com.lukasrosz.revhost.storage.entity.SecurityUserDTO;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.lukasrosz.revhost.storage.entities.helperentities.SecurityUser;
 
 import java.util.List;
 
@@ -45,12 +44,12 @@ public class UsersController {
 	@GetMapping("/showRegistrationForm")
 	public String showRegistrationForm(Model model) {
 		
-		model.addAttribute("newUser", new SecurityUser());
+		model.addAttribute("newUser", new SecurityUserDTO());
 		return "registration-form";
 	}
 	
 	@PostMapping("/processRegistrationForm")
-	public String processLogin(@Valid @ModelAttribute("newUser") SecurityUser newUser,
+	public String processLogin(@Valid @ModelAttribute("newUser") SecurityUserDTO newUser,
 								BindingResult bindingResult, Model model) {
 
 		if(bindingResult.hasErrors()) {
@@ -59,7 +58,7 @@ public class UsersController {
 		}
 		
 		if(userExists(newUser)) {
-			model.addAttribute("registrationError", "User already exists");
+			model.addAttribute("registrationError", "UserDTO already exists");
 			return "registration-form";
 		}
 		
@@ -80,8 +79,8 @@ public class UsersController {
 		return "redirect:/";
 	}
 	
-	private boolean userExists(SecurityUser securityUser) {
-		return userDetailsManager.userExists(securityUser.getUsername());
+	private boolean userExists(SecurityUserDTO securityUserDTO) {
+		return userDetailsManager.userExists(securityUserDTO.getUsername());
 	}
 	
 	@InitBinder

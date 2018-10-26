@@ -17,8 +17,8 @@
 
 
 		<th:block th:each="file : ${files}">
-			<a th:href="@{/storage/file(code=${file.code})}" th:text="${file.name}" 
-				style="font-size: 20px;"></a> 
+			<span th:text="${file.name}" 
+				style="font-size: 20px;"></span> 
 				Size=<a th:text="${file.getSizeAsString()}" style="font-size: 15px;"></a>
 				 | Addition Date=<a th:text="${#strings.substring(file.additionDate, 0, #strings.length(file.additionDate)-2)}" style="font-size: 15px;"></a>
 			<br>

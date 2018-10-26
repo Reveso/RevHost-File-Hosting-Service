@@ -1,4 +1,4 @@
-package com.lukasrosz.revhost.storage.entities;
+package com.lukasrosz.revhost.storage.entity;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="users")
-public class User {
+public class UserDTO {
 
 	@Id
 	@NotNull
@@ -31,16 +31,16 @@ public class User {
 	
 	@OneToMany(mappedBy="username", fetch=FetchType.LAZY,
 			cascade=CascadeType.ALL)
-	private List<Authority> authorities;
+	private List<AuthorityDTO> authorities;
 	
-//	@OneToMany(targetEntity=RevHostFile.class, mappedBy="user", fetch=FetchType.LAZY,
+//	@OneToMany(targetEntity=FileDTO.class, mappedBy="user", fetch=FetchType.LAZY,
 //			cascade=CascadeType.ALL)
-	@OneToMany(targetEntity=RevHostFile.class, fetch=FetchType.LAZY,
+	@OneToMany(targetEntity= FileDTO.class, fetch=FetchType.LAZY,
 	cascade=CascadeType.ALL)
 	@JoinColumn(name="username")
-	private List<RevHostFile> files;
+	private List<FileDTO> files;
 			
-	public User() {
+	public UserDTO() {
 
 	}
 	
@@ -68,26 +68,26 @@ public class User {
 		this.enabled = enabled;
 	}
 
-	public List<Authority> getAuthorities() {
+	public List<AuthorityDTO> getAuthorities() {
 		return authorities;
 	}
 
-	public void setAuthorities(List<Authority> authorities) {
+	public void setAuthorities(List<AuthorityDTO> authorities) {
 		this.authorities = authorities;
 	}
 
 	
-	public List<RevHostFile> getFiles() {
+	public List<FileDTO> getFiles() {
 		return files;
 	}
 
-	public void setFiles(List<RevHostFile> files) {
+	public void setFiles(List<FileDTO> files) {
 		this.files = files;
 	}
 
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", password=" + password + ", enabled=" + enabled +"]";
+		return "UserDTO [username=" + username + ", password=" + password + ", enabled=" + enabled +"]";
 	}
 	
 }

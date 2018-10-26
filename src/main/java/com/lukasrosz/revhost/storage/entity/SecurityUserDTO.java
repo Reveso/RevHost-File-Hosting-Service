@@ -1,9 +1,9 @@
-package com.lukasrosz.revhost.storage.entities.helperentities;
+package com.lukasrosz.revhost.storage.entity;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public class SecurityUser {
+public class SecurityUserDTO {
 
 	@NotNull(message="is required")
 	@Size(min=1, message="is required")
@@ -13,7 +13,7 @@ public class SecurityUser {
 	@Size(min=1, message="is required")
 	private String password;
 	
-	public SecurityUser() {
+	public SecurityUserDTO() {
 
 	}
 
@@ -35,7 +35,7 @@ public class SecurityUser {
 
 	@Override
 	public String toString() {
-		return "SecurityUser [username=" + username + ", password=" + password + "]";
+		return "SecurityUserDTO [username=" + username + ", password=" + password + "]";
 	}
 	
 }

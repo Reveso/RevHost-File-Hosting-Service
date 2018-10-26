@@ -1,15 +1,11 @@
-package com.lukasrosz.revhost.storage.entities;
+package com.lukasrosz.revhost.storage.entity;
 
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -17,7 +13,7 @@ import org.apache.commons.lang.RandomStringUtils;
 
 @Entity
 @Table(name="files")
-public class RevHostFile {
+public class FileDTO {
 	
 	@Id
 	@Column(name="file_code")
@@ -43,14 +39,10 @@ public class RevHostFile {
 	@NotNull
 	@Column(name="file_size")
 	private long size;
-	
+
 	@NotNull
-	@Column(name="file_type")
-	private String type;
-	
-	@NotNull
-	@Column(name="access")
-	private String access;
+	@Column(name="public_access")
+	private boolean publicAccess;
 	
 //	@ManyToOne(cascade= 
 //		{CascadeType.DETACH, CascadeType.MERGE, 
@@ -61,7 +53,11 @@ public class RevHostFile {
 	@Column(name="username")
 	private String username;
 
-	public RevHostFile() {
+	@NotNull
+	@Column(name="url")
+	private String url;
+
+	public FileDTO() {
 
 	}
 	
@@ -90,7 +86,7 @@ public class RevHostFile {
 	    	return generatedCode;
 	    }
 	}
-	
+
 	public String getCode() {
 		return code;
 	}
@@ -139,20 +135,12 @@ public class RevHostFile {
 		this.size = size;
 	}
 
-	public String getType() {
-		return type;
+	public boolean isPublicAccess() {
+		return publicAccess;
 	}
 
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getAccess() {
-		return access;
-	}
-
-	public void setAccess(String access) {
-		this.access = access;
+	public void setPublicAccess(boolean publicAccess) {
+		this.publicAccess = publicAccess;
 	}
 
 	public String getUsername() {
@@ -163,11 +151,26 @@ public class RevHostFile {
 		this.username = username;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	@Override
 	public String toString() {
-		return "RevHostFile [code=" + code + ", bucketName=" + bucketName + ", key=" + key + ", name=" + name
-				+ ", additionDate=" + additionDate + ", size=" + size + ", type=" + type + ", access=" + access
-				+ ", username=" + username + "]";
+		return "FileDTO{" +
+				"code='" + code + '\'' +
+				", bucketName='" + bucketName + '\'' +
+				", key='" + key + '\'' +
+				", name='" + name + '\'' +
+				", additionDate=" + additionDate +
+				", size=" + size +
+				", publicAccess=" + publicAccess +
+				", username='" + username + '\'' +
+				", url='" + url + '\'' +
+				'}';
 	}
-	
 }
