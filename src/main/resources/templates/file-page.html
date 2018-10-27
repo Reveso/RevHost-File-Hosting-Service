@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org">
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${file.name}">Filename</title>
+</head>
+<body>
+    <h2>RevHost File Hosting</h2>
+
+    <div th:text="${file.name}">Filepage</div>
+    <hr>
+    Username:
+    <div sec:authentication="name">username</div>
+    <hr>
+
+
+    <span th:text="${file.name}" style="font-size: 20px;">filename.extension</span>
+    Size=<span th:text="${file.getSizeAsString()}" style="font-size: 15px;">99999 MB</span>
+    | Addition Date=<span th:text="${#strings.substring(file.additionDate, 0, #strings.length(file.additionDate)-2)}" style="font-size: 15px;">2018.01.02 10:20</span>
+    <br>
+    <a th:href="${downloadURL}">Download</a>
+
+    <span th:if="${fileOwner}">
+        |
+        <a th:href="@{/storage/delete(c=${file.code})}"
+               onclick="if(!(confirm('Are you sure you want to delete this file?'))) return false">Delete</a> |
+        <a th:href="@{/storage/changeAccess(c=${file.code}, a='public')}">Make public</a> |
+        <a th:href="@{/storage/changeAccess(c=${file.code}, a='private')}">Make private</a>
+    </span>
+
+    <hr>
+    <a th:href="@{/}">Back to home page</a>
+</body>
+</html>

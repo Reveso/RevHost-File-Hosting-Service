@@ -17,15 +17,17 @@
 
 
 		<th:block th:each="file : ${files}">
-			<span th:text="${file.name}" 
-				style="font-size: 20px;"></span> 
-				Size=<a th:text="${file.getSizeAsString()}" style="font-size: 15px;"></a>
-				 | Addition Date=<a th:text="${#strings.substring(file.additionDate, 0, #strings.length(file.additionDate)-2)}" style="font-size: 15px;"></a>
+			<a th:href="@{/file(c=${file.code})}" th:text="${file.name}"
+				style="font-size: 20px;">filename.extension</a>
+				Size=<a th:text="${file.getSizeAsString()}" style="font-size: 15px;">99999 MB</a>
+				 | Addition Date=<a th:text="${#strings.substring(file.additionDate, 0, #strings.length(file.additionDate)-2)}" style="font-size: 15px;">2018.01.02 10:20</a>
 			<br>
-			<a th:href="@{/storage(v=${file.code})}">Download</a> | 
-			<a th:href="@{/storage/delete(code=${file.code})}"
+			<a th:href="@{/download(c=${file.code})}">Download</a> |
+			<a th:href="@{/storage/delete(c=${file.code})}"
 				onclick="if(!(confirm('Are you sure you want to delete this file?'))) return false">
-				Delete</a>
+				Delete</a> |
+			<a th:href="@{/storage/changeAccess(c=${file.code}, a='public')}">Make public</a> |
+			<a th:href="@{/storage/changeAccess(c=${file.code}, a='private')}">Make private</a>
 			<hr>
 		</th:block>
 		

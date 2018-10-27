@@ -27,9 +27,13 @@ import org.springframework.validation.BindingResult;
 @RequestMapping("/users")
 public class UsersController {
 
-	@Autowired
 	private UserDetailsManager userDetailsManager;
-	
+
+	@Autowired
+	public UsersController(UserDetailsManager userDetailsManager) {
+		this.userDetailsManager = userDetailsManager;
+	}
+
 	@GetMapping("/login")
 	public String showLoginPage() {
 		return "login-form";

@@ -43,12 +43,7 @@ public class FileDTO {
 	@NotNull
 	@Column(name="public_access")
 	private boolean publicAccess;
-	
-//	@ManyToOne(cascade= 
-//		{CascadeType.DETACH, CascadeType.MERGE, 
-//				CascadeType.PERSIST, CascadeType.REFRESH},
-//		fetch=FetchType.EAGER)
-//	@JoinColumn(name="username")
+
 	@NotNull
 	@Column(name="username")
 	private String username;

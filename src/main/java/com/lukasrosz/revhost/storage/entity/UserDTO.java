@@ -32,9 +32,7 @@ public class UserDTO {
 	@OneToMany(mappedBy="username", fetch=FetchType.LAZY,
 			cascade=CascadeType.ALL)
 	private List<AuthorityDTO> authorities;
-	
-//	@OneToMany(targetEntity=FileDTO.class, mappedBy="user", fetch=FetchType.LAZY,
-//			cascade=CascadeType.ALL)
+
 	@OneToMany(targetEntity= FileDTO.class, fetch=FetchType.LAZY,
 	cascade=CascadeType.ALL)
 	@JoinColumn(name="username")
