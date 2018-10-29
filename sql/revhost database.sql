@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS `users`;
 DROP TABLE IF EXISTS `authorities`;
 DROP TABLE IF EXISTS `files`;
 DROP TABLE IF EXISTS `public-files`;
+DROP TABLE IF EXISTS `UserConnection`;
 
 CREATE TABLE `users` (
 	`username` VARCHAR(50) NOT NULL,
@@ -35,5 +36,23 @@ CREATE TABLE `files` (
 	FOREIGN KEY (`username`) REFERENCES `users` (`username`),
     PRIMARY KEY(`file_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS UserConnection;
+create table UserConnection (
+	userId varchar(255) not null,
+	providerId varchar(255) not null,
+	providerUserId varchar(255),
+	rank int not null,
+	displayName varchar(255),
+	profileUrl varchar(512),
+	imageUrl varchar(512),
+	accessToken varchar(512) not null,
+	secret varchar(512),
+	refreshToken varchar(512),
+	expireTime bigint,
+	PRIMARY KEY (userId, providerId, providerUserId)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE UNIQUE INDEX UserConnectionRank ON UserConnection (userId, providerId, rank);
+
 
 UNLOCK TABLES;

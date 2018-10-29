@@ -62,20 +62,20 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	@Override
-	public boolean store(MultipartFile multipartFile) {
+	public boolean store(MultipartFile multipartFile) throws Exception {
 		String loggedUser = getLoggedUser();
 		String fileCode = FileDTO.generateNewCode(fileDAO.findAllCodes());
 		String filePath = "";
-
+		final String tempPath = System.getProperty("java.io.tmpdir");
+		System.out.println(tempPath);
 		try {
-			File file = convertMultipartToFile(multipartFile);
 			filePath = generateFilePath(multipartFile, fileCode, loggedUser);
+			File file = convertMultipartToFile(multipartFile);
 
 			uploadFileToS3Bucket(filePath, file);
 			file.delete();
 		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 
 		FileDTO fileDTO = new FileDTO();
@@ -102,8 +102,10 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	private File convertMultipartToFile(MultipartFile file) throws IOException {
+		final String tempPath = System.getProperty("java.io.tmpdir");
+		System.out.println(tempPath);
 
-		File convFile = new File(file.getOriginalFilename());
+		File convFile = new File(tempPath + file.getOriginalFilename());
 		FileOutputStream fStream = new FileOutputStream(convFile);
 		fStream.write(file.getBytes());
 		fStream.close();

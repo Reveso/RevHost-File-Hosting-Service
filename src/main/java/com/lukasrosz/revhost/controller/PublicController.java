@@ -32,12 +32,7 @@ public class PublicController {
         FileDTO file = storageService.loadFile(fileCode);
         model.addAttribute("file", file);
 
-        String downloadURL;
-        if(file.isPublicAccess()) {
-            downloadURL = file.getUrl();
-        } else {
-            downloadURL = "/download/" + file.getName() + "?code=" + fileCode;
-        }
+        String downloadURL = "/download/" + file.getName() + "?code=" + fileCode;
         model.addAttribute("downloadURL", downloadURL);
 
         boolean fileOwner = getLoggedUser().equals(file.getUsername()) ? true : false;
@@ -69,6 +64,7 @@ public class PublicController {
             e.printStackTrace();
         }
     }
+
 
     private String getLoggedUser() {
         return SecurityContextHolder.getContext().getAuthentication().getName();

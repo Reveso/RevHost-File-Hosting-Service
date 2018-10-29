@@ -10,7 +10,7 @@ import com.lukasrosz.revhost.exception.AccessToFileDeniedException;
 
 public interface StorageService {
 	
-	boolean store(MultipartFile file);
+	boolean store(MultipartFile file) throws Exception;
 	
 	List<FileDTO> loadLoggedUserFiles();
 	

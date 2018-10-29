@@ -6,7 +6,10 @@ import com.lukasrosz.revhost.storage.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -36,7 +39,7 @@ public class StorageController {
 	}
 
 	@PostMapping("/upload")
-	public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+	public String handleFileUpload(@RequestParam("file") MultipartFile file) throws Exception {
 		storageService.store(file);
 		return "redirect:/";
 	}
@@ -54,8 +57,5 @@ public class StorageController {
 		return "redirect:/storage/files";
 	}
 	
-	@ExceptionHandler(AccessToFileDeniedException.class)
-	public String handleStorageFileNotFound(NullPointerException exc) {
-		return "redirect:/error";
-	}
+    //TODO: Exception handlers
 }

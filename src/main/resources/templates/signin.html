@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Login Page</title>
+
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Login to your RevHost account</h1>
+<p th:if="${loginError}" class="error">Wrong user or password</p>
+
+<form th:action="@{/signin/authenticate}" method="post">
+    <input type="hidden" name="_csrf" value="${_csrf.token}"/>
+    <label for="username">Username</label>:
+    <input type="text" id="username" name="username" autofocus="autofocus"/>
+    <br><br>
+    <label for="password">Password</label>:
+    <input type="password" id="password" name="password"/>
+    <br><br>
+    <input type="submit" value="Log in"/>
+</form>
+
+<p><a th:href="@{/auth/twitter}">Sign in with Twitter</a></p>
+
+<p><a th:href="@{/auth/facebook}">Sign in with Facebook</a></p>
+
+<br>
+<form th:action="@{/}" method="get">
+    <input type="submit" value="Back to Home Page"/>
+</form>
+
+
+</body>
+
+</html>
