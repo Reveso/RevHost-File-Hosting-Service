@@ -1,9 +1,9 @@
 package com.lukasrosz.revhost.controller;
 
-import com.lukasrosz.revhost.exception.AccessToFileDeniedException;
 import com.lukasrosz.revhost.storage.entity.FileDTO;
 import com.lukasrosz.revhost.storage.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,13 +46,13 @@ public class StorageController {
 
 	@GetMapping("/changeAccess")
 	public String changeFileAccess(@RequestParam("c") String fileCode, @RequestParam("a") String newAccess)
-			throws AccessToFileDeniedException {
+			throws AccessDeniedException {
 		storageService.setFileAccess(fileCode, newAccess);
 		return "redirect:/storage/files";
 	}
 	
 	@GetMapping("/delete")
-	public String DeleteFile(@RequestParam("c") String fileCode) throws AccessToFileDeniedException {
+	public String DeleteFile(@RequestParam("c") String fileCode) throws AccessDeniedException {
 		storageService.deleteFile(fileCode);
 		return "redirect:/storage/files";
 	}

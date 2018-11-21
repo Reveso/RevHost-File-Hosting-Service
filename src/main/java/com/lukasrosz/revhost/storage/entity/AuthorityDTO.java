@@ -1,5 +1,10 @@
 package com.lukasrosz.revhost.storage.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +15,9 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="authorities")
+@Getter@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthorityDTO {
 	
 	@Id
@@ -24,33 +32,8 @@ public class AuthorityDTO {
 	@NotNull
 	@Column(name="authority")
 	private String authority;
-	
-	public AuthorityDTO() {
-		
-	}
 
-	public AuthorityDTO(@NotNull String username, @NotNull String authority) {
-		this.username = username;
-		this.authority = authority;
-	}
-	
 	public AuthorityDTO(@NotNull String authority) {
-		this.authority = authority;
-	}
-	
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getAuthority() {
-		return authority;
-	}
-
-	public void setAuthority(String authority) {
 		this.authority = authority;
 	}
 
@@ -58,5 +41,4 @@ public class AuthorityDTO {
 	public String toString() {
 		return authority;
 	}
-
 }

@@ -1,6 +1,7 @@
 package com.lukasrosz.revhost.social;
 
 import org.springframework.social.connect.UserProfile;
+import org.springframework.social.facebook.api.User;
 
 public class SignupForm {
 
@@ -25,7 +26,7 @@ public class SignupForm {
 
     public static SignupForm fromProviderUser(UserProfile providerUser) {
         SignupForm form = new SignupForm();
-        form.setUsername(providerUser.getUsername());
+        form.setUsername(providerUser.getId());
         return form;
     }
 }

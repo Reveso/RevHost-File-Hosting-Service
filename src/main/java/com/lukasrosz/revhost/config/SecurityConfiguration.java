@@ -4,6 +4,8 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import com.lukasrosz.revhost.social.SimpleSocialUserDetailsService;
+import com.lukasrosz.revhost.storage.entity.SecurityUserDTO;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,10 +60,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/storage/**").authenticated()
                 .and()
                     .formLogin()
-                    .loginPage("/singin")
+                    .loginPage("/signin")
                     .failureUrl("/signin?param.error=bad_credentials")
                     .loginProcessingUrl("/signin/authenticate").permitAll()
-                    .defaultSuccessUrl("/connect")
+                    .defaultSuccessUrl("/")
                 .and()
                     .logout().logoutUrl("/signout").permitAll()
                     .logoutSuccessUrl("/");

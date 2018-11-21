@@ -1,5 +1,10 @@
 package com.lukasrosz.revhost.storage.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -14,6 +19,9 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="users")
+@NoArgsConstructor
+@ToString
+@Getter@Setter
 public class UserDTO {
 
 	@Id
@@ -37,55 +45,5 @@ public class UserDTO {
 	cascade=CascadeType.ALL)
 	@JoinColumn(name="username")
 	private List<FileDTO> files;
-			
-	public UserDTO() {
-
-	}
-	
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public boolean getEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	public List<AuthorityDTO> getAuthorities() {
-		return authorities;
-	}
-
-	public void setAuthorities(List<AuthorityDTO> authorities) {
-		this.authorities = authorities;
-	}
-
-	
-	public List<FileDTO> getFiles() {
-		return files;
-	}
-
-	public void setFiles(List<FileDTO> files) {
-		this.files = files;
-	}
-
-	@Override
-	public String toString() {
-		return "UserDTO [username=" + username + ", password=" + password + ", enabled=" + enabled +"]";
-	}
 	
 }

@@ -8,7 +8,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.User;
 import org.springframework.social.security.SocialUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -43,6 +46,14 @@ public class SignupController {
         Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
         if(connection != null) {
             System.out.println("22TUUUUUUUUUUUUUUUUUUUUU");
+            System.out.println(connection.getDisplayName());
+            Facebook facebook = (Facebook) connection.getApi();
+            String [] fields = { "id", "email",  "first_name", "last_name"};
+            User userProfile = facebook.fetchObject("me", User.class, fields);
+            System.out.println(userProfile.getId());
+            System.out.println(userProfile.getFirstName());
+            System.out.println(userProfile.getLastName());
+            System.out.println("END");
             return SignupForm.fromProviderUser(connection.fetchUserProfile());
         } else {
             return new SignupForm();

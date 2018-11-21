@@ -9,10 +9,17 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang.RandomStringUtils;
 
 @Entity
 @Table(name="files")
+@Getter@Setter
+@NoArgsConstructor
+@ToString
 public class FileDTO {
 	
 	@Id
@@ -52,10 +59,6 @@ public class FileDTO {
 	@Column(name="url")
 	private String url;
 
-	public FileDTO() {
-
-	}
-	
 	public String getSizeAsString() {
 		if(size <= Math.pow(10, 6)) {
 			double sizeKB = size / (Math.pow(10, 3));
@@ -80,92 +83,5 @@ public class FileDTO {
 	    } else {
 	    	return generatedCode;
 	    }
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getBucketName() {
-		return bucketName;
-	}
-
-	public void setBucketName(String bucketName) {
-		this.bucketName = bucketName;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Date getAdditionDate() {
-		return additionDate;
-	}
-
-	public void setAdditionDate(Date additionDate) {
-		this.additionDate = additionDate;
-	}
-
-	public long getSize() {
-		return size;
-	}
-
-	public void setSize(long size) {
-		this.size = size;
-	}
-
-	public boolean isPublicAccess() {
-		return publicAccess;
-	}
-
-	public void setPublicAccess(boolean publicAccess) {
-		this.publicAccess = publicAccess;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	@Override
-	public String toString() {
-		return "FileDTO{" +
-				"code='" + code + '\'' +
-				", bucketName='" + bucketName + '\'' +
-				", key='" + key + '\'' +
-				", name='" + name + '\'' +
-				", additionDate=" + additionDate +
-				", size=" + size +
-				", publicAccess=" + publicAccess +
-				", username='" + username + '\'' +
-				", url='" + url + '\'' +
-				'}';
 	}
 }

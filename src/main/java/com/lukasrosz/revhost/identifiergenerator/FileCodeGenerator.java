@@ -18,6 +18,4 @@ public class FileCodeGenerator implements IdentifierGenerator {
 	 
 	    return generatedCode;
 	}
-	
-
 }

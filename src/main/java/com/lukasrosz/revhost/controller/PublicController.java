@@ -1,10 +1,10 @@
 package com.lukasrosz.revhost.controller;
 
-import com.lukasrosz.revhost.exception.AccessToFileDeniedException;
 import com.lukasrosz.revhost.storage.entity.FileDTO;
 import com.lukasrosz.revhost.storage.service.StorageService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,7 +28,7 @@ public class PublicController {
 
     @GetMapping("/file")
     public String showFilePage(@RequestParam("c") String fileCode, Model model)
-            throws AccessToFileDeniedException {
+            throws AccessDeniedException {
         FileDTO file = storageService.loadFile(fileCode);
         model.addAttribute("file", file);
 
@@ -41,7 +41,7 @@ public class PublicController {
     }
 
     @GetMapping("/download") //download?c=fileCode
-    public String downloadFile(@RequestParam("c") String fileCode) throws AccessToFileDeniedException {
+    public String downloadFile(@RequestParam("c") String fileCode) throws AccessDeniedException {
         FileDTO file = storageService.loadFile(fileCode);
         return "redirect:/download/" + file.getName() + "?code=" + fileCode;
     }
@@ -49,7 +49,7 @@ public class PublicController {
     @GetMapping(value = "/download/{filename:.+}")
     public void downloadFile(HttpServletResponse response, @RequestParam("code") String fileCode,
                              @PathVariable("filename") String filename)
-            throws AccessToFileDeniedException {
+            throws AccessDeniedException {
         response.setContentType("application/file");
         try {
             InputStream is = storageService.loadAsInputStream(fileCode);

@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import com.lukasrosz.revhost.storage.entity.FileDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +28,6 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import com.lukasrosz.revhost.exception.AccessToFileDeniedException;
 import com.lukasrosz.revhost.storage.dao.FileDAO;
 
 @Service
@@ -127,24 +127,24 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	@Override
-	public FileDTO loadFile(String fileCode) throws AccessToFileDeniedException {
+	public FileDTO loadFile(String fileCode) throws AccessDeniedException {
 		FileDTO fileDTO = getFileFromDB(fileCode);
 		if(fileDTO == null) return null;
 
 		if(getLoggedUser().equals(fileDTO.getUsername())
 				|| fileDTO.isPublicAccess()) {
 			return fileDTO;
-		} else throw new AccessToFileDeniedException();
+		} else throw new AccessDeniedException("Logged user is not file's owner and file is not public");
 	}
 
 	@Override
-	public InputStream loadAsInputStream(String fileCode) throws AccessToFileDeniedException {
+	public InputStream loadAsInputStream(String fileCode) throws AccessDeniedException {
 		FileDTO fileDTO = getFileFromDB(fileCode);
 		if(fileDTO == null) return null;
 
 		if (!getLoggedUser().equals(fileDTO.getUsername())
 				&& !fileDTO.isPublicAccess()) {
-			throw new AccessToFileDeniedException();
+			throw new AccessDeniedException("Logged user is not file's owner and file is not public");
 		}
 
 		S3Object s3Object = s3client.getObject(bucketName, fileDTO.getKey());
@@ -152,20 +152,20 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
 	@Override
-	public void deleteFile(String fileCode) throws AccessToFileDeniedException {
+	public void deleteFile(String fileCode) throws AccessDeniedException {
 		FileDTO fileDTO = getFileFromDB(fileCode);
 		if(fileDTO == null) return;
 
 		if (getLoggedUser().equals(fileDTO.getUsername())) {
 			deleteFileFromS3Bucket(fileDTO);
 			fileDAO.deleteById(fileCode);
-		} else throw new AccessToFileDeniedException("Logged user is not file's owner");
+		} else throw new AccessDeniedException("Logged user is not file's owner");
 	}
 
 	@Override
-	public void deleteAll(String username) throws AccessToFileDeniedException {
+	public void deleteAll(String username) throws AccessDeniedException {
 		if (!getLoggedUser().equals(username)) {
-			throw new AccessToFileDeniedException("Logged user is not file's owner");
+			throw new AccessDeniedException("Logged user is not file's owner");
 		}
 
 		List<String> codes = fileDAO.findCodesByUsername(username);
@@ -180,12 +180,12 @@ public class AmazonS3StorageService implements StorageService {
 	}
 
     @Override
-    public void setFileAccess(String fileCode, String access) throws AccessToFileDeniedException {
+    public void setFileAccess(String fileCode, String access) throws AccessDeniedException {
 		FileDTO fileDTO = getFileFromDB(fileCode);
 		if(fileDTO == null) return;
 
 		if(!getLoggedUser().equals(fileDTO.getUsername())) {
-			throw new AccessToFileDeniedException("Logged user is not file's owner");
+			throw new AccessDeniedException("Logged user is not file's owner");
 		}
 
 		if(access.equals("private")) {
