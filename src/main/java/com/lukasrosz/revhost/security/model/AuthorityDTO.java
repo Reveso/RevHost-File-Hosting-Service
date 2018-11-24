@@ -1,4 +1,4 @@
-package com.lukasrosz.revhost.storage.entity;
+package com.lukasrosz.revhost.security.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,10 +32,6 @@ public class AuthorityDTO {
 	@NotNull
 	@Column(name="authority")
 	private String authority;
-
-	public AuthorityDTO(@NotNull String authority) {
-		this.authority = authority;
-	}
 
 	@Override
 	public String toString() {

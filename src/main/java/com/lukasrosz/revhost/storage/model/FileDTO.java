@@ -1,4 +1,4 @@
-package com.lukasrosz.revhost.storage.entity;
+package com.lukasrosz.revhost.storage.model;
 
 import java.util.Date;
 import java.util.List;
@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang.RandomStringUtils;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity
 @Table(name="files")
@@ -39,8 +41,7 @@ public class FileDTO {
 	private String name;
 	
 	@Column(name="addition_date", nullable=false)
-//	@Temporal(value=TemporalType.TIMESTAMP)
-//	@Generated(value=GenerationTime.ALWAYS)
+	@Generated(value= GenerationTime.INSERT)
 	private Date additionDate;
 	
 	@NotNull
@@ -63,7 +64,7 @@ public class FileDTO {
 		if(size <= Math.pow(10, 6)) {
 			double sizeKB = size / (Math.pow(10, 3));
 			return sizeKB + " KB";
-		} else if (size <= Math.pow(1, 9)) {
+		} else if (size <= Math.pow(10, 9)) {
 			double sizeMB = size / (Math.pow(10, 6));;
 			return sizeMB + " MB";
 		} else {

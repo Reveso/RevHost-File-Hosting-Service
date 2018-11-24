@@ -1,6 +1,6 @@
 package com.lukasrosz.revhost.controller;
 
-import com.lukasrosz.revhost.storage.entity.FileDTO;
+import com.lukasrosz.revhost.storage.model.FileDTO;
 import com.lukasrosz.revhost.storage.service.StorageService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,11 +65,8 @@ public class PublicController {
         }
     }
 
-
     private String getLoggedUser() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
-
-    //TODO: Exception Handler
 
 }

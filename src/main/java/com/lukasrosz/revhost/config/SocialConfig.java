@@ -43,8 +43,6 @@ public class SocialConfig extends SocialConfigurerAdapter {
         populator.addScript(
                 new ClassPathResource(
                         "org/springframework/social/connect/jdbc/JdbcUsersConnectionRepository.sql"));
-//        populator.addScript(new ClassPathResource("sql/create_users.sql"));
-//        populator.addScript(new ClassPathResource("sql/init_users.sql"));
         populator.setContinueOnError(true); // Continue in case the create script already ran
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDatabasePopulator(populator);

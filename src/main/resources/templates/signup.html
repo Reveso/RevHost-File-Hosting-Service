@@ -12,8 +12,12 @@
 <body>
 
 	<h1>Sign up to RevHost</h1>
+
+	<p th:if="${usernameTaken}" class="error">Username is already taken</p>
+
 	<form th:action="@{/signup}" method="POST"
 		th:object="${signupForm}">
+
 		<p>
 			Username: <input type="text" th:field="*{username}"
 				autofocus="autofocus" />

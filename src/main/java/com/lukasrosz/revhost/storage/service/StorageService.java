@@ -3,7 +3,7 @@ package com.lukasrosz.revhost.storage.service;
 import java.io.InputStream;
 import java.util.List;
 
-import com.lukasrosz.revhost.storage.entity.FileDTO;
+import com.lukasrosz.revhost.storage.model.FileDTO;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.multipart.MultipartFile;
 

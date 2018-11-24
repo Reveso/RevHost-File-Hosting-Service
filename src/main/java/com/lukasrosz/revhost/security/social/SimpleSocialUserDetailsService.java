@@ -1,4 +1,4 @@
-package com.lukasrosz.revhost.social;
+package com.lukasrosz.revhost.security.social;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

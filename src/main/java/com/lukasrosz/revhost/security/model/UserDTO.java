@@ -1,5 +1,6 @@
-package com.lukasrosz.revhost.storage.entity;
+package com.lukasrosz.revhost.security.model;
 
+import com.lukasrosz.revhost.storage.model.FileDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,21 +8,15 @@ import lombok.ToString;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="users")
 @NoArgsConstructor
 @ToString
-@Getter@Setter
+@Getter
+@Setter
 public class UserDTO {
 
 	@Id

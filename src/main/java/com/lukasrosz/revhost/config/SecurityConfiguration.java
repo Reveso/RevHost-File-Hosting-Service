@@ -1,11 +1,8 @@
 package com.lukasrosz.revhost.config;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import com.lukasrosz.revhost.social.SimpleSocialUserDetailsService;
-import com.lukasrosz.revhost.storage.entity.SecurityUserDTO;
-import lombok.val;
+import com.lukasrosz.revhost.security.social.SimpleSocialUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,29 +36,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-//		http.authorizeRequests()
-//			.antMatchers("/storage/**").authenticated()
-//			.and()
-//			.formLogin()
-//				.loginPage("/users/login")
-//				.loginProcessingUrl("/authenticateUser")
-//				.failureUrl("/users/login-error")
-//				.defaultSuccessUrl("/")
-//				.permitAll()
-//			.and()
-//			.logout().permitAll()
-//			.logoutSuccessUrl("/")
-//			.and()
-//			.exceptionHandling().accessDeniedPage("/users/access-denied")
-//			.and()
-//			.rememberMe().key("uniqueAndSecret");
         http.authorizeRequests()
                 .antMatchers("/storage/**").authenticated()
                 .and()
                     .formLogin()
                     .loginPage("/signin")
-                    .failureUrl("/signin?param.error=bad_credentials")
+                    .failureUrl("/signin?error=bad_credentials")
                     .loginProcessingUrl("/signin/authenticate").permitAll()
                     .defaultSuccessUrl("/")
                 .and()
@@ -69,7 +49,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .logoutSuccessUrl("/");
 
         http.apply(new SpringSocialConfigurer());
-
 //		http.authorizeRequests().anyRequest().authenticated();
     }
 

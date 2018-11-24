@@ -1,6 +1,5 @@
 package com.lukasrosz.revhost.storage.service;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +9,7 @@ import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
-import com.lukasrosz.revhost.storage.entity.FileDTO;
+import com.lukasrosz.revhost.storage.model.FileDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -67,10 +66,9 @@ public class AmazonS3StorageService implements StorageService {
 		String fileCode = FileDTO.generateNewCode(fileDAO.findAllCodes());
 		String filePath = "";
 		final String tempPath = System.getProperty("java.io.tmpdir");
-		System.out.println(tempPath);
 		try {
 			filePath = generateFilePath(multipartFile, fileCode, loggedUser);
-			File file = convertMultipartToFile(multipartFile);
+			java.io.File file = convertMultipartToFile(multipartFile);
 
 			uploadFileToS3Bucket(filePath, file);
 			file.delete();
@@ -96,16 +94,15 @@ public class AmazonS3StorageService implements StorageService {
 		return true;
 	}
 
-	private void uploadFileToS3Bucket(String fileName, File file) {
+	private void uploadFileToS3Bucket(String fileName, java.io.File file) {
 		s3client.putObject(
 				new PutObjectRequest(bucketName, fileName, file).withCannedAcl(CannedAccessControlList.Private));
 	}
 
-	private File convertMultipartToFile(MultipartFile file) throws IOException {
+	private java.io.File convertMultipartToFile(MultipartFile file) throws IOException {
 		final String tempPath = System.getProperty("java.io.tmpdir");
-		System.out.println(tempPath);
 
-		File convFile = new File(tempPath + file.getOriginalFilename());
+		java.io.File convFile = new java.io.File(tempPath + file.getOriginalFilename());
 		FileOutputStream fStream = new FileOutputStream(convFile);
 		fStream.write(file.getBytes());
 		fStream.close();

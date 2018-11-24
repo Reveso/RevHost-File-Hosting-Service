@@ -1,11 +1,13 @@
 package com.lukasrosz.revhost.controller;
 
-import com.lukasrosz.revhost.social.SignupForm;
+import com.lukasrosz.revhost.security.social.SignupForm;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
@@ -14,15 +16,18 @@ import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.User;
 import org.springframework.social.security.SocialUser;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Collections;
 import java.util.List;
+
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 
 @Controller
 @RequestMapping("/signup")
@@ -41,43 +46,75 @@ public class SignupController {
     }
 
     @GetMapping
-    public SignupForm signupForm(WebRequest request) {
-        System.out.println("TUUUUUUUUUUUUUUUUUUUUU");
+    public String signupForm(WebRequest request, Model model) {
         Connection<?> connection = providerSignInUtils.getConnectionFromSession(request);
+        SignupForm signupForm;
         if(connection != null) {
-            System.out.println("22TUUUUUUUUUUUUUUUUUUUUU");
-            System.out.println(connection.getDisplayName());
-            Facebook facebook = (Facebook) connection.getApi();
-            String [] fields = { "id", "email",  "first_name", "last_name"};
-            User userProfile = facebook.fetchObject("me", User.class, fields);
-            System.out.println(userProfile.getId());
-            System.out.println(userProfile.getFirstName());
-            System.out.println(userProfile.getLastName());
-            System.out.println("END");
-            return SignupForm.fromProviderUser(connection.fetchUserProfile());
+            if(connection.getApi().toString().contains("facebook")) {
+                Facebook facebook = (Facebook) connection.getApi();
+                String[] fields = {"id", "email", "first_name", "last_name"};
+                User userProfile = facebook.fetchObject("me", User.class, fields);
+
+                signupForm = new SignupForm(userProfile.getId(),
+                        randomAlphabetic(20));
+                val message = signupUser(signupForm, request);
+                model.addAttribute("message", message);
+                return "index";
+            } else {
+                UserProfile userProfile = connection.fetchUserProfile();
+                signupForm = new SignupForm(userProfile.getUsername(),
+                        randomAlphabetic(20));
+                val message = signupUser(signupForm, request);
+                model.addAttribute("message", message);
+                return "index";
+            }
         } else {
-            return new SignupForm();
+            signupForm = new SignupForm();
+            model.addAttribute(signupForm);
+            return "signup";
         }
     }
 
     @PostMapping
-    public String signup(@Validated SignupForm form, BindingResult formBinding,
-                         WebRequest request) {
+    public String signupUser(@Validated SignupForm form, BindingResult formBinding,
+                         WebRequest request, Model model) {
         if(!formBinding.hasErrors()) {
-            SocialUser user = createUser(form);
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(),
-                            null, user.getAuthorities()));
-            providerSignInUtils.doPostSignUp(user.getUsername(), request);
-            return "redirect:/";
+            String message = signupUser(form, request);
+            model.addAttribute("message", message);
+            return "index";
         }
         return null;
     }
 
+    private String encodePassword(String password) {
+        val encoder = new BCryptPasswordEncoder();
+        return "{bcrypt}" + encoder.encode(password);
+    }
+
+    private String signupUser(SignupForm form, WebRequest request) {
+        SocialUser user = createUser(form);
+        providerSignInUtils.doPostSignUp(user.getUsername(), request);
+        return "You signed up successfully. You can now sign in.";
+    }
+
     private SocialUser createUser(SignupForm form) {
         SocialUser user = new SocialUser(
-                form.getUsername(), form.getPassword(), DEFAULT_ROLES);
+                form.getUsername(), encodePassword(form.getPassword()), DEFAULT_ROLES);
         userDetailsManager.createUser(user);
         return user;
     }
+
+    @ExceptionHandler(MySQLIntegrityConstraintViolationException.class)
+    public ModelAndView mySqlIntegrityConstraintViolationExceptionHandler(){
+        val modelAndView = new ModelAndView("signup");
+        modelAndView.addObject("usernameTaken", true);
+        modelAndView.addObject(new SignupForm());
+        return modelAndView;
+    }
+
+    @InitBinder
+	public void initBinder(WebDataBinder dataBinder) {
+		StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(true);
+		dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
+	}
 }

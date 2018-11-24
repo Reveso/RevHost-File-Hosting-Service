@@ -6,24 +6,30 @@
 <title>RevHost</title>
 </head>
 
+<style>
+	.message{
+		color: orange;
+	}
+</style>
 <body>
 
 	<h2>RevHost File Hosting</h2>
-
 	<hr>
-	<div sec:authorize="isAuthenticated()">
-		<div sec:authentication="name"></div>
-		Authenticated user roles:
-		<div sec:authentication="principal.authorities"></div>
-		<hr>
-		<form th:action="@{/storage/files}" method="GET">
-			<input type="submit" value="Files" />
-		</form>
 
-		<br>
-		<form th:action="@{/storage/upload}" method="GET">
-			<input type="submit" value="Upload" />
-		</form>
+	<div sec:authorize="isAuthenticated()">
+		Username:
+		<div sec:authentication="name">username</div>
+
+		<p><a th:href="@{/user/profile}">Profile</a></p>
+
+		<p th:text="${message}" class="message">Some message</p>
+		<hr>
+
+		<p><a th:href="@{/storage/files}">Files</a></p>
+
+		<p><a th:href="@{/storage/upload}">Upload File</a></p>
+
+		<p><a href="@{/user/profileSettings}"></a></p>
 
 		<hr>
 		<form th:action="@{/signout}" method="POST">
@@ -32,16 +38,17 @@
 	</div>
 
 	<div sec:authorize="isAnonymous()">
-		<form th:action="@{/signin}" method="GET">
-			<input type="submit" value="Login" />
-		</form>
-		<br>
-		<form th:action="@{/signup}" method="GET">
-			<input type="submit" value="Sign up" />
-		</form>
+		<p th:text="${message}" class="message">Some message</p>
+
+		<p><a th:href="@{/signin}">Sign in</a></p>
+
+		<p><a th:href="@{/signup}">Sign up</a></p>
+
+		<p><a th:href="@{/auth/twitter}">Sign in with Twitter</a></p>
+
+		<p><a th:href="@{/auth/facebook}">Sign in with Facebook</a></p>
 	</div>
 
-	Click <a th:href="@{/connect/}">here</a> to see your social Network connection
 </body>
 
 </html>

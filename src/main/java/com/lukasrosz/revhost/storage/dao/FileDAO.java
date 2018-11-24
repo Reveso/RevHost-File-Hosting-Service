@@ -1,6 +1,6 @@
 package com.lukasrosz.revhost.storage.dao;
 
-import com.lukasrosz.revhost.storage.entity.FileDTO;
+import com.lukasrosz.revhost.storage.model.FileDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
