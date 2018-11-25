@@ -21,9 +21,11 @@
 		<p>
 			Username: <input type="text" th:field="*{username}"
 				autofocus="autofocus" />
+			<span th:if="${#fields.hasErrors('username')}" class="error">Username must not be empty</span>
 		</p>
 		<p>
 			Password: <input type="password" th:field="*{password}" />
+			<span th:if="${#fields.hasErrors('password')}" class="error">Password must not be empty</span>
 		</p>
 		<input type="submit" value="Sign up" />
 	</form>
