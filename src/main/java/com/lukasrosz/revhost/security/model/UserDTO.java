@@ -40,5 +40,8 @@ public class UserDTO {
 	cascade=CascadeType.ALL)
 	@JoinColumn(name="username")
 	private List<FileDTO> files;
-	
+
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private UserDetails userDetails;
+
 }
