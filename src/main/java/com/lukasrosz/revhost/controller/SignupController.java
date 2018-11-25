@@ -1,7 +1,5 @@
 package com.lukasrosz.revhost.controller;
 
-import com.lukasrosz.revhost.security.dao.UserDetailsDAO;
-import com.lukasrosz.revhost.security.model.UserDetails;
 import com.lukasrosz.revhost.security.social.SignupForm;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import lombok.val;
@@ -39,16 +37,12 @@ public class SignupController {
             singletonList(new SimpleGrantedAuthority("USER"));
     private final ProviderSignInUtils providerSignInUtils;
     private final UserDetailsManager userDetailsManager;
-    private UserDetailsDAO userDetailsDAO;
-
 
     @Autowired
     public SignupController(ProviderSignInUtils providerSignInUtils,
-                            UserDetailsManager userDetailsManager,
-                            UserDetailsDAO userDetailsDAO){
+                            UserDetailsManager userDetailsManager){
         this.providerSignInUtils = providerSignInUtils;
         this.userDetailsManager = userDetailsManager;
-        this.userDetailsDAO = userDetailsDAO;
     }
 
     @GetMapping
@@ -65,7 +59,6 @@ public class SignupController {
                         randomAlphabetic(20));
                 val message = signupUser(signupForm, request);
                 model.addAttribute("message", message);
-                createUserDetails(signupForm.getUsername(), true);
                 return "index";
             } else {
                 UserProfile userProfile = connection.fetchUserProfile();
@@ -73,7 +66,6 @@ public class SignupController {
                         randomAlphabetic(20));
                 val message = signupUser(signupForm, request);
                 model.addAttribute("message", message);
-                createUserDetails(signupForm.getUsername(), true);
                 return "index";
             }
         } else {
@@ -89,7 +81,6 @@ public class SignupController {
         if(!formBinding.hasErrors()) {
             String message = signupUser(form, request);
             model.addAttribute("message", message);
-            createUserDetails(form.getUsername(), false);
             return "index";
         }
         return null;
@@ -111,10 +102,6 @@ public class SignupController {
                 form.getUsername(), encodePassword(form.getPassword()), DEFAULT_ROLES);
         userDetailsManager.createUser(user);
         return user;
-    }
-
-    private void createUserDetails(String username, boolean userConnection) {
-        userDetailsDAO.save(new UserDetails(username, userConnection));
     }
 
     @ExceptionHandler(MySQLIntegrityConstraintViolationException.class)

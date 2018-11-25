@@ -1,4 +1,4 @@
-package com.lukasrosz.revhost.security.dao;
+package com.lukasrosz.revhost.storage.dao;
 
 import com.lukasrosz.revhost.security.model.UserDTO;
 import org.springframework.data.repository.CrudRepository;

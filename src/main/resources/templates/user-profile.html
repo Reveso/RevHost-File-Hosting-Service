@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymleaf.org">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>User Profile</title>
@@ -8,15 +7,11 @@
 <body>
     <h2>RevHost File Hosting</h2>
     <hr>
-    <p th:text="${user.username}">Username</p>
-    <p>Files: <span th:text="${user.getFiles().size()}">142</span></p>
+    Some profile info here
     <hr>
-
-    <div th:if="${user.userDetails.socialConnected}">
     if not authenticated:
         Connect to twitter
         Connect to fb
-    </div>
 
 </body>
 </html>

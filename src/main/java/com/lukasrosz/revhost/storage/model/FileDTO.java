@@ -41,7 +41,7 @@ public class FileDTO {
 	private String name;
 	
 	@Column(name="addition_date", nullable=false)
-//	@Generated(value= GenerationTime.INSERT)
+	@Generated(value= GenerationTime.INSERT)
 	private Date additionDate;
 	
 	@NotNull
